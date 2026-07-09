@@ -4,7 +4,11 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-#특징자
+#특징자 -> ORB, SIFT / AKAZE, HOG.. :특징 추출
+# 1. 특징 추출(배경 + 타겟)
+# 2. 추출한 특징 매칭 -> 매칭 알고리즘 Brute Force / Flann 
+# 3. 매칭한 결과 시각화
+#4. + 이미지 피라미드, 자동 회전
 def match_descriptor(back, target):
     back_image = cv2.imread(back)
     back_image = cv2.cvtColor(back_image, cv2.COLOR_BGR2GRAY)
@@ -56,9 +60,15 @@ def match_descriptor(back, target):
         #perspective 변환: 길이 변화 있음
         transforms = cv2.perspectiveTransform(corners, M)
         cv2.polylines(back_image, [np.int32(transforms)], True, (0,255,0), 5)
+                        #선 색깔, 단일 점 색상, 마스크의 위치(전달), 2 = 매칭 안된 점 무시
+    draw_params = dict(matchColor = (255, 0, 0), singlePointColor = None, matchesMask = matches_mask, flags =2)
+    
+    #배경과 타겟을 나란히 놓고 그림
+    match_image = cv2.drawMatches(back_image, kp1, target_image, kp2, good_matches, None, **draw_params)        
+    #**(언패킹, 변수 이름): 위에 정의한 변수 갖다 쓰쇼. -> 나열할 수 있는 매개변수값을 하나로 붂어서 함수 안에 '풀어서 써' 전달.
 
-        plt.imshow(back_image)
-        plt.show()
+    plt.imshow(match_image)
+    plt.show()
 
 
 #템플릿 매칭
@@ -90,8 +100,8 @@ def match_template(back, target):
     plt.show()
 
 if __name__ == '__main__':
-    background_image = r'C:\Users\user\Desktop\Git\OpenCV\0707\card.png'
-    target_image = r'C:\Users\user\Desktop\Git\OpenCV\0707\card_part.png'
+    background_image = r'C:\Users\user\Desktop\Git\OpenCV\0707\practice_0707\card.png'
+    target_image = r'C:\Users\user\Desktop\Git\OpenCV\0707\practice_0707\card_part.png'
 
     #템플릿 매칭
     #match_template(background_image, target_image)
